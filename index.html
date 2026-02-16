@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MovieApp Ultimate</title>
+  </head>
+  <body>
+    <div id="app">
+      <nav class="navbar">
+        <div class="logo">🍿 MovieApp</div>
+        <div class="nav-links">
+          <button id="nav-popular" class="active">Populaires</button>
+          <button id="nav-toprated">Mieux Notés</button>
+          <button id="nav-favorites">❤️ Favoris</button>
+        </div>
+        <button id="theme-toggle" class="theme-btn">☀️</button>
+      </nav>
+
+      <div class="toolbar">
+        <div class="search-group">
+          <input type="text" id="search-input" placeholder="Rechercher..." />
+          <button id="search-btn">🔍</button>
+        </div>
+        
+        <div class="filter-group">
+          <select id="sort-select" style="padding: 8px; border-radius: 4px; background: var(--bg-input); color: white; border: 1px solid #555;">
+            <option value="DEFAULT">Tri par défaut</option>
+            <option value="AZ">Nom (A-Z)</option>
+            <option value="ZA">Nom (Z-A)</option>
+            <option value="RATING">Note (Croissante)</option>
+          </select>
+          <span id="stats-counter" style="color: #aaa; align-self: center; font-size: 0.9rem;">0 films</span>
+        </div>
+
+        <div class="filter-group">
+          <input type="number" id="year-input" placeholder="Année" min="1900" max="2030" />
+          <button id="year-btn">Filtrer</button>
+        </div>
+      </div>
+      
+      <main id="main-content"></main>
+
+      <div id="load-more-container" class="load-more-container" style="display: none;">
+        <button id="load-more-btn">Voir plus de films</button>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
