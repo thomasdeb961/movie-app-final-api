@@ -3,7 +3,7 @@
 Application web de découverte de films, développée en **TypeScript Vanilla** (sans framework) avec l'API TMDB.
 Ce projet a été réalisé pour démontrer la maîtrise du DOM, des appels API asynchrones et de la gestion d'état côté client.
 
-🔗 **[Voir la démo en ligne]([https://movie-app-final-api.vercel.app](https://movie-app-final-api.vercel.app/))** 
+🔗 Voir la démo en ligne([https://movie-app-final-api.vercel.app](https://movie-app-final-api.vercel.app/)
 ## ✨ Fonctionnalités
 
 ### 🔍 Navigation & Recherche
