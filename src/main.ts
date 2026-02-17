@@ -175,7 +175,7 @@ async function renderMovieDetail(id: number) {
           <div class="poster-wrapper"><img src="${posterUrl}"></div>
           <div class="info-wrapper">
              <h1>${movie.title}</h1>
-             <p>⭐ ${movie.vote_average.toFixed(1)} | 📅 ${movie.release_date} | ⏱️ ${movie.runtime} min</p>
+             <p>⭐ ${movie.vote_average.toFixed(1)} |  ${movie.release_date} | ${movie.runtime} min</p>
              <div class="tags">${genres}</div>
              <p style="line-height:1.6; margin-top:1rem;">${movie.overview}</p>
              <button id="back-btn" style="padding:10px 20px; cursor:pointer; margin-top:20px; background:var(--bg-input); color:var(--text-main); border:none; border-radius:4px;">⬅ Retour</button>
@@ -223,8 +223,8 @@ function createCompareCard(m: Movie, opp: Movie) {
 }
 
 function getTitleByMode() {
-    if (currentMode === 'POPULAR') return '🔥 Films Populaires';
-    if (currentMode === 'TOP_RATED') return '🏆 Mieux Notés';
+    if (currentMode === 'POPULAR') return ' Films Populaires';
+    if (currentMode === 'TOP_RATED') return ' Mieux Notés';
     if (currentMode === 'SEARCH') return `Résultats: "${currentQuery}"`;
     if (currentMode === 'YEAR') return `Films de ${currentQuery}`;
     return '❤️ Mes Favoris';
@@ -239,7 +239,7 @@ async function loadCategory(type: 'POPULAR' | 'TOP_RATED', reset: boolean = true
     currentPage = 1; currentMode = type; updateActiveButton(type === 'POPULAR' ? btnPopular : btnTopRated); sortSelect.value = 'DEFAULT'; 
   }
   const data = type === 'POPULAR' ? await fetchPopularMovies(currentPage) : await fetchTopRatedMovies(currentPage);
-  renderGrid(data.results, type === 'POPULAR' ? '🔥 Films Populaires' : '🏆 Mieux Notés', !reset);
+  renderGrid(data.results, type === 'POPULAR' ? ' Films Populaires' : ' Mieux Notés', !reset);
 }
 
 async function handleSearch(reset: boolean = true) {
