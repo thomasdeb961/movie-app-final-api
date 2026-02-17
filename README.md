@@ -1,30 +1,30 @@
-# 🎬 MovieApp Ultimate
+#  MovieApp Ultimate
 
 Application web de découverte de films, développée en **TypeScript Vanilla** (sans framework) avec l'API TMDB.
 Ce projet a été réalisé pour démontrer la maîtrise du DOM, des appels API asynchrones et de la gestion d'état côté client.
 
 🔗 Voir la démo en ligne([https://movie-app-final-api.vercel.app](https://movie-app-final-api.vercel.app/)
-## ✨ Fonctionnalités
+##  Fonctionnalités
 
-### 🔍 Navigation & Recherche
+###  Navigation & Recherche
 * **Catalogue** : Affichage des films "Populaires" et "Mieux notés".
 * **Recherche** : Barre de recherche connectée à l'API TMDB.
 * **Filtres** : Filtrage par année de sortie.
 * **Tri Dynamique** : Tri des résultats affichés (A-Z, Z-A, Note) sans rechargement.
 * **Pagination** : Bouton "Voir plus" pour charger les films suivants.
 
-### ⚙️ Fonctionnalités Avancées
+###  Fonctionnalités Avancées
 * **Comparateur de Films** : Outil permettant de sélectionner 2 films et de les comparer côte à côte (Notes, Dates, Durées) avec mise en évidence du vainqueur.
-* **Favoris** : Système de likes ❤️ avec persistance des données (LocalStorage).
+* **Favoris** : Système de likes  avec persistance des données (LocalStorage).
 * **Détails Enrichis** : Fiche détaillée avec synopsis, genres, casting, et bouton de retour intelligent.
 
-### 🎨 Interface Utilisateur (UI/UX)
+###  Interface Utilisateur (UI/UX)
 * **Design Responsive** : Grille adaptative (Mobile / Tablette / Desktop).
 * **Thème** : Mode Sombre / Mode Clair (Dark Mode) avec sauvegarde du choix utilisateur.
 * **Feedback** : Animations de chargement (Spinner CSS) et transitions fluides.
 * **Stats** : Compteur de films affichés en temps réel.
 
-## 🛠️ Stack Technique
+##  Stack Technique
 
 * **Langage** : TypeScript (Strict Mode)
 * **Build Tool** : Vite
@@ -32,7 +32,7 @@ Ce projet a été réalisé pour démontrer la maîtrise du DOM, des appels API 
 * **API** : [The Movie Database (TMDB)](https://www.themoviedb.org/documentation/api)
 * **Hébergement** : Vercel
 
-## 🚀 Installation et Lancement
+##  Installation et Lancement
 
 1.  **Cloner le projet**
     ```bash
@@ -60,7 +60,7 @@ Ce projet a été réalisé pour démontrer la maîtrise du DOM, des appels API 
     npm run build
     ```
 
-## 📂 Structure du Projet
+##  Structure du Projet
 
 ```text
 /src
