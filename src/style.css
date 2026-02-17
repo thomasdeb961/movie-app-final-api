@@ -21,7 +21,7 @@ body.light-mode {
   --bg-input: #ffffff;
   --text-main: #1c1e21;
   --text-secondary: #65676b;
-  --accent-color: blue; /* Tu peux changer ça si tu veux un bleu différent en light */
+  --accent-color: blue; 
   --shadow: rgba(0, 0, 0, 0.1);
 }
 
@@ -136,7 +136,7 @@ select {
 }
 
 .toolbar button:hover {
-  background: #b20710; /* Un rouge foncé au survol, ou change pour une variante de bleu */
+  background: rgb(126, 126, 255); 
 }
 
 /* 5. GRILLE DE FILMS (CARDS)*/
