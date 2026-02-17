@@ -1,13 +1,13 @@
 :root {
   --bg-body: #1a1a1a; --bg-nav: #000000; --bg-card: #2c2c2c;
   --bg-toolbar: #252525; --bg-input: #333333; --text-main: #ffffff;
-  --text-secondary: #cccccc; --accent-color: #e50914; --shadow: rgba(0,0,0,0.3);
+  --text-secondary: #cccccc; --accent-color: blue; --shadow: rgba(0,0,0,0.3);
 }
 
 body.light-mode {
   --bg-body: #f0f2f5; --bg-nav: #ffffff; --bg-card: #ffffff;
   --bg-toolbar: #e4e6eb; --bg-input: #ffffff; --text-main: #1c1e21;
-  --text-secondary: #65676b; --accent-color: #e50914; --shadow: rgba(0,0,0,0.1);
+  --text-secondary: #65676b; --accent-color: blue; --shadow: rgba(0,0,0,0.1);
 }
 
 body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg-body); color: var(--text-main); transition: 0.3s; }
