@@ -4,7 +4,7 @@ import './style.css';
 
 // --- DOM ELEMENTS ---
 const mainContent = document.getElementById('main-content') as HTMLElement;
-const loadMoreContainer = document.getElementById('load-more-container') as HTMLElement; // <-- CORRECTION ICI
+const loadMoreContainer = document.getElementById('load-more-container') as HTMLElement; 
 const loadMoreBtn = document.getElementById('load-more-btn') as HTMLButtonElement;
 const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
 const searchInput = document.getElementById('search-input') as HTMLInputElement;
@@ -126,7 +126,7 @@ function handleSort() {
 // --- DETAILS & COMPARE VIEWS ---
 
 async function renderDetail(id: number) {
-    loadMoreContainer.style.display = 'none'; // CORRECTION ICI
+    loadMoreContainer.style.display = 'none';
     mainContent.innerHTML = '<div class="loader"></div>';
     const m = await fetchMovieDetails(id);
     mainContent.innerHTML = `
@@ -145,7 +145,7 @@ async function renderDetail(id: number) {
 }
 
 async function renderCompare() {
-    loadMoreContainer.style.display = 'none'; // CORRECTION ICI
+    loadMoreContainer.style.display = 'none'; 
     const [m1, m2] = await Promise.all(compareList.map(m => fetchMovieDetails(m.id)));
     const tpl = (m: Movie, win: boolean) => `
         <div class="compare-card" style="border: ${win ? '2px solid #4cd137' : 'none'}">
