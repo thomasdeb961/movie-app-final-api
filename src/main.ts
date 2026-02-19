@@ -4,6 +4,7 @@ import './style.css';
 
 // --- DOM ELEMENTS ---
 const mainContent = document.getElementById('main-content') as HTMLElement;
+const loadMoreContainer = document.getElementById('load-more-container') as HTMLElement; // <-- CORRECTION ICI
 const loadMoreBtn = document.getElementById('load-more-btn') as HTMLButtonElement;
 const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
 const searchInput = document.getElementById('search-input') as HTMLInputElement;
@@ -25,7 +26,6 @@ document.body.appendChild(compareBar);
 
 // --- FONCTIONS GÉNÉRIQUES (Le coeur du code) ---
 
-// Fonction unique pour charger n'importe quel type de film (évite de répéter 4x le même code)
 async function loadMovies(mode: string, apiCall: () => Promise<any>, reset = true) {
     if (reset) {
         currentMode = mode;
@@ -34,12 +34,13 @@ async function loadMovies(mode: string, apiCall: () => Promise<any>, reset = tru
         document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
         if (mode === 'POPULAR') document.getElementById('nav-popular')?.classList.add('active');
         if (mode === 'TOP_RATED') document.getElementById('nav-toprated')?.classList.add('active');
-        loadMoreBtn.style.display = 'flex';
+        
+        // CORRECTION ICI : On affiche ou on cache le conteneur du bouton
+        loadMoreContainer.style.display = mode === 'FAVORITES' ? 'none' : 'flex';
     }
     
     try {
         const data = await apiCall();
-        // Si c'est une recherche vide ou favoris, on gère différemment
         const results = mode === 'FAVORITES' ? favorites : data.results;
         renderGrid(results, getTitle(mode), !reset);
     } catch (e) { console.error(e); mainContent.innerHTML = '<p>Erreur de chargement.</p>'; }
@@ -62,7 +63,10 @@ function renderGrid(movies: Movie[], title: string, append: boolean) {
     }
 
     const grid = document.querySelector('.grid-container')!;
-    if (movies.length === 0) grid.innerHTML = '<p>Aucun résultat.</p>';
+    if (movies.length === 0) {
+        grid.innerHTML = '<p style="text-align:center; grid-column: 1 / -1;">Aucun résultat.</p>';
+        loadMoreContainer.style.display = 'none'; // Cache le bouton si plus de résultats
+    }
 
     movies.forEach(movie => {
         const card = document.createElement('article');
@@ -75,7 +79,7 @@ function renderGrid(movies: Movie[], title: string, append: boolean) {
                 <button class="action-btn fav-btn ${isFav ? 'active' : ''}">${isFav ? '❤️' : '🤍'}</button>
                 <button class="action-btn comp-btn ${isComp ? 'active' : ''}">VS</button>
             </div>
-            <img src="${movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://placehold.co/500x750'}" alt="${movie.title}">
+            <img src="${movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://placehold.co/500x750?text=Pas+d+image'}" alt="${movie.title}">
             <div class="movie-info"><h3>${movie.title}</h3><span class="rating">⭐ ${movie.vote_average.toFixed(1)}</span></div>
         `;
         
@@ -93,7 +97,7 @@ function toggleFav(m: Movie) {
     idx === -1 ? favorites.push(m) : favorites.splice(idx, 1);
     localStorage.setItem('myFavorites', JSON.stringify(favorites));
     if (currentMode === 'FAVORITES') loadMovies('FAVORITES', async () => ({ results: favorites }));
-    else renderGrid(currentMovies, getTitle(currentMode), false); // Rafraichir les coeurs
+    else renderGrid(currentMovies, getTitle(currentMode), false); 
 }
 
 function toggleComp(m: Movie) {
@@ -116,37 +120,37 @@ function handleSort() {
     
     const grid = document.querySelector('.grid-container')!;
     grid.innerHTML = '';
-    renderGrid(sorted, getTitle(currentMode), true); // Astuce: true pour ne pas reset le titre
+    renderGrid(sorted, getTitle(currentMode), true); 
 }
 
 // --- DETAILS & COMPARE VIEWS ---
 
 async function renderDetail(id: number) {
-    loadMoreBtn.style.display = 'none';
+    loadMoreContainer.style.display = 'none'; // CORRECTION ICI
     mainContent.innerHTML = '<div class="loader"></div>';
     const m = await fetchMovieDetails(id);
     mainContent.innerHTML = `
         <div class="movie-detail">
             <div class="hero-banner" style="background-image: url('https://image.tmdb.org/t/p/original${m.poster_path}')"></div>
             <div class="hero-content">
-                <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" style="width:200px; border-radius:10px;">
+                <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" style="width:200px; border-radius:10px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
                 <div class="info-wrapper">
                     <h1>${m.title}</h1>
                     <p>${m.release_date} | ${m.vote_average} ⭐</p>
                     <p>${m.overview}</p>
-                    <button onclick="location.reload()" style="margin-top:20px; padding:10px;">⬅ Retour</button>
+                    <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; cursor:pointer; background:var(--bg-input); color:var(--text-main); border:none; border-radius:4px;">⬅ Retour</button>
                 </div>
             </div>
         </div>`;
 }
 
 async function renderCompare() {
-    loadMoreBtn.style.display = 'none';
+    loadMoreContainer.style.display = 'none'; // CORRECTION ICI
     const [m1, m2] = await Promise.all(compareList.map(m => fetchMovieDetails(m.id)));
     const tpl = (m: Movie, win: boolean) => `
-        <div class="compare-card" style="border: ${win ? '2px solid green' : 'none'}">
-            <img src="https://image.tmdb.org/t/p/w300${m.poster_path}" width="150">
-            <h3>${m.title}</h3><p>${m.vote_average} ⭐</p><p>${m.release_date}</p>
+        <div class="compare-card" style="border: ${win ? '2px solid #4cd137' : 'none'}">
+            <img src="https://image.tmdb.org/t/p/w300${m.poster_path}" width="150" style="border-radius:8px; margin-bottom:1rem;">
+            <h3>${m.title}</h3><p>⭐ ${m.vote_average.toFixed(1)}</p><p>📅 ${m.release_date}</p>
         </div>`;
     
     mainContent.innerHTML = `
@@ -155,7 +159,7 @@ async function renderCompare() {
             ${tpl(m1, m1.vote_average > m2.vote_average)}
             ${tpl(m2, m2.vote_average > m1.vote_average)}
         </div>
-        <button onclick="location.reload()" style="display:block; margin:20px auto; padding:10px;">Retour</button>
+        <button onclick="location.reload()" style="display:block; margin:20px auto; padding:10px 20px; background:var(--accent-color); color:white; border:none; border-radius:4px; cursor:pointer;">Retour à l'accueil</button>
     `;
 }
 
@@ -163,16 +167,38 @@ async function renderCompare() {
 document.getElementById('nav-popular')!.onclick = () => loadMovies('POPULAR', () => fetchPopularMovies(1));
 document.getElementById('nav-toprated')!.onclick = () => loadMovies('TOP_RATED', () => fetchTopRatedMovies(1));
 document.getElementById('nav-favorites')!.onclick = () => loadMovies('FAVORITES', async () => ({ results: favorites }));
-document.getElementById('search-btn')!.onclick = () => { currentQuery = searchInput.value; loadMovies('SEARCH', () => searchMovies(currentQuery, 1)); };
-document.getElementById('year-btn')!.onclick = () => { currentQuery = yearInput.value; loadMovies('YEAR', () => fetchMoviesByYear(+currentQuery, 1)); };
+
+document.getElementById('search-btn')!.onclick = () => { 
+    currentQuery = searchInput.value; 
+    if(currentQuery) loadMovies('SEARCH', () => searchMovies(currentQuery, 1)); 
+};
+
+document.getElementById('year-btn')!.onclick = () => { 
+    currentQuery = yearInput.value; 
+    if(currentQuery) loadMovies('YEAR', () => fetchMoviesByYear(+currentQuery, 1)); 
+};
+
 document.getElementById('btn-compare')!.onclick = renderCompare;
 sortSelect.onchange = handleSort;
 
+// GESTION DU BOUTON VOIR PLUS
 loadMoreBtn.onclick = () => {
     currentPage++;
-    if (currentMode === 'POPULAR') loadMovies('POPULAR', () => fetchPopularMovies(currentPage), false);
-    else if (currentMode === 'TOP_RATED') loadMovies('TOP_RATED', () => fetchTopRatedMovies(currentPage), false);
-    else if (currentMode === 'SEARCH') loadMovies('SEARCH', () => searchMovies(currentQuery, currentPage), false);
+    const originalText = loadMoreBtn.textContent;
+    loadMoreBtn.textContent = 'Chargement...';
+    
+    let apiCall;
+    if (currentMode === 'POPULAR') apiCall = () => fetchPopularMovies(currentPage);
+    else if (currentMode === 'TOP_RATED') apiCall = () => fetchTopRatedMovies(currentPage);
+    else if (currentMode === 'SEARCH') apiCall = () => searchMovies(currentQuery, currentPage);
+    else if (currentMode === 'YEAR') apiCall = () => fetchMoviesByYear(+currentQuery, currentPage);
+
+    if (apiCall) {
+        apiCall().then(data => {
+            renderGrid(data.results, getTitle(currentMode), true);
+            loadMoreBtn.textContent = originalText;
+        });
+    }
 };
 
 // Thème & Init
