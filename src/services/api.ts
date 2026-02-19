@@ -3,6 +3,7 @@ import type { Movie, MovieApiResponse } from '../types/Movie';
 const API_KEY = '5f5094246532b3a6bd329189c0b10a20';
 const BASE_URL = 'https://api.themoviedb.org/3';
 
+// --- API CALLS ---
 async function fetchFromApi<T>(endpoint: string, params: string = ''): Promise<T> {
   const url = `${BASE_URL}${endpoint}?api_key=${API_KEY}&language=fr-FR${params}`;
   const response = await fetch(url);
@@ -10,6 +11,8 @@ async function fetchFromApi<T>(endpoint: string, params: string = ''): Promise<T
   return await response.json() as T;
 }
 
+// Ces fonctions appellent l'API pour récupérer les films populaires, les mieux notés, 
+// les détails d'un film, les résultats de recherche, et les films par année
 export async function fetchPopularMovies(page: number = 1): Promise<MovieApiResponse> {
   return fetchFromApi<MovieApiResponse>('/movie/popular', `&page=${page}`);
 }
