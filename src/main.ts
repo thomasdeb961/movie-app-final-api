@@ -1,8 +1,10 @@
+//importation et liaison des fichiers
 import { fetchPopularMovies, fetchTopRatedMovies, fetchMovieDetails, searchMovies, fetchMoviesByYear } from './services/api';
 import type { Movie } from './types/Movie';
 import './style.css';
 
-// --- DOM ELEMENTS ---
+// Récuperer les balises avec leur id pour les utiliser dans le code et les manipuler
+// les htmlelement sont typés pour éviter les erreurs de typescript 
 const mainContent = document.getElementById('main-content') as HTMLElement;
 const loadMoreContainer = document.getElementById('load-more-container') as HTMLElement; 
 const loadMoreBtn = document.getElementById('load-more-btn') as HTMLButtonElement;
@@ -10,7 +12,8 @@ const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
 const searchInput = document.getElementById('search-input') as HTMLInputElement;
 const yearInput = document.getElementById('year-input') as HTMLInputElement;
 
-// --- STATE ---
+//  Variables globales pour stocker l'état de l'application a partir du local 
+// et éviter les appels API redondants
 let favorites: Movie[] = JSON.parse(localStorage.getItem('myFavorites') || '[]');
 let compareList: Movie[] = [];
 let currentMovies: Movie[] = [];
@@ -18,14 +21,17 @@ let currentPage = 1;
 let currentMode: string = 'POPULAR'; // POPULAR, TOP_RATED, SEARCH, YEAR, FAVORITES
 let currentQuery = '';
 
-// --- INITIALISATION UI ---
+// on va pouvoir comparer les films, on affiche une barre de comparaison en bas 
+// de l'écran avec un compteur et un bouton pour lancer la comparaison
+// (appendchild) pour insérer un élément dans l'autre et la barre de comparaison 
 const compareBar = document.createElement('div');
 compareBar.className = 'compare-bar';
 compareBar.innerHTML = `<span id="comp-count" style="color:white; font-weight:bold;">0 films</span><button id="btn-compare" style="display:none; padding:8px 16px; background:var(--accent-color); border:none; color:white; border-radius:4px; cursor:pointer;">COMPARER</button>`;
 document.body.appendChild(compareBar);
 
-// --- FONCTIONS GÉNÉRIQUES (Le coeur du code) ---
 
+// une fct assynchrone pour charger les films en fonction du mode 
+// (populaire, mieux notés, favoris, etc.) et de l'appel API correspondant
 async function loadMovies(mode: string, apiCall: () => Promise<any>, reset = true) {
     if (reset) {
         currentMode = mode;
@@ -38,7 +44,9 @@ async function loadMovies(mode: string, apiCall: () => Promise<any>, reset = tru
         // CORRECTION ICI : On affiche ou on cache le conteneur du bouton
         loadMoreContainer.style.display = mode === 'FAVORITES' ? 'none' : 'flex';
     }
-    
+
+    // on essaye de faire l'appel API et d'afficher les résultats, 
+    // sinon on affiche un message d'erreur
     try {
         const data = await apiCall();
         const results = mode === 'FAVORITES' ? favorites : data.results;
@@ -46,6 +54,7 @@ async function loadMovies(mode: string, apiCall: () => Promise<any>, reset = tru
     } catch (e) { console.error(e); mainContent.innerHTML = '<p>Erreur de chargement.</p>'; }
 }
 
+// une fct pour générer le titre de la page en fonction du mode actuel (populaire, recherche, etc.)
 function getTitle(mode: string) {
     if (mode === 'SEARCH') return `Recherche: "${currentQuery}"`;
     if (mode === 'YEAR') return `Année: ${currentQuery}`;
@@ -53,8 +62,11 @@ function getTitle(mode: string) {
     return mode === 'POPULAR' ? 'Films Populaires' : 'Mieux Notés';
 }
 
+// une fct pour afficher les films dans une grille, 
+// avec des cartes pour chaque film et des boutons d'action (favoris, comparer)
 function renderGrid(movies: Movie[], title: string, append: boolean) {
     document.getElementById('stats-counter')!.textContent = `${movies.length} affichés`;
+    // Si append est false, on remplace le contenu actuel, sinon on ajoute à la liste existante
     if (!append) {
         currentMovies = movies;
         mainContent.innerHTML = `<h2 style="text-align:center">${title}</h2><div class="grid-container"></div>`;
@@ -62,12 +74,14 @@ function renderGrid(movies: Movie[], title: string, append: boolean) {
         currentMovies = [...currentMovies, ...movies];
     }
 
+    // Si aucun film n'est trouvé, on affiche un message et on cache le bouton "Voir Plus"
     const grid = document.querySelector('.grid-container')!;
     if (movies.length === 0) {
         grid.innerHTML = '<p style="text-align:center; grid-column: 1 / -1;">Aucun résultat.</p>';
         loadMoreContainer.style.display = 'none'; // Cache le bouton si plus de résultats
     }
 
+    // Pour chaque film, on crée une carte avec l'affiche, le titre, la note et les boutons d'action
     movies.forEach(movie => {
         const card = document.createElement('article');
         card.className = 'movie-card';
@@ -92,6 +106,8 @@ function renderGrid(movies: Movie[], title: string, append: boolean) {
 
 // --- LOGIQUE MÉTIER ---
 
+// une fct pour ajouter ou retirer un film des favoris,
+// et mettre à jour le localStorage et l'affichage en conséquence
 function toggleFav(m: Movie) {
     const idx = favorites.findIndex(f => f.id === m.id);
     idx === -1 ? favorites.push(m) : favorites.splice(idx, 1);
@@ -100,6 +116,8 @@ function toggleFav(m: Movie) {
     else renderGrid(currentMovies, getTitle(currentMode), false); 
 }
 
+// une fct pour ajouter ou retirer un film de la liste de comparaison,
+// avec une limite de 2 films, et mettre à jour la barre de comparaison et le bouton de comparaison 
 function toggleComp(m: Movie) {
     const idx = compareList.findIndex(c => c.id === m.id);
     if (idx === -1 && compareList.length < 2) compareList.push(m);
@@ -111,6 +129,7 @@ function toggleComp(m: Movie) {
     document.getElementById('btn-compare')!.style.display = compareList.length === 2 ? 'block' : 'none';
 }
 
+// une fct pour trier les films affichés en fonction du critère sélectionné (titre A-Z, Z-A, note)
 function handleSort() {
     const sort = sortSelect.value;
     let sorted = [...currentMovies];
@@ -124,7 +143,8 @@ function handleSort() {
 }
 
 // --- DETAILS & COMPARE VIEWS ---
-
+// une fct pour afficher les détails d'un film sélectionné, avec une grande bannière, 
+// les infos principales et un bouton de retour 
 async function renderDetail(id: number) {
     loadMoreContainer.style.display = 'none';
     mainContent.innerHTML = '<div class="loader"></div>';
@@ -144,6 +164,8 @@ async function renderDetail(id: number) {
         </div>`;
 }
 
+// une fct asychrone pour afficher la comparaison entre 2 films sélectionnés, avec une mise en avant 
+// du gagnant (meilleure note) et un bouton de retour
 async function renderCompare() {
     loadMoreContainer.style.display = 'none'; 
     const [m1, m2] = await Promise.all(compareList.map(m => fetchMovieDetails(m.id)));
@@ -164,6 +186,8 @@ async function renderCompare() {
 }
 
 // --- EVENTS ---
+// On lie les boutons de navigation aux fonctions de chargement correspondantes,
+// et on gère le bouton de recherche et de filtrage par année
 document.getElementById('nav-popular')!.onclick = () => loadMovies('POPULAR', () => fetchPopularMovies(1));
 document.getElementById('nav-toprated')!.onclick = () => loadMovies('TOP_RATED', () => fetchTopRatedMovies(1));
 document.getElementById('nav-favorites')!.onclick = () => loadMovies('FAVORITES', async () => ({ results: favorites }));
@@ -182,6 +206,7 @@ document.getElementById('btn-compare')!.onclick = renderCompare;
 sortSelect.onchange = handleSort;
 
 // GESTION DU BOUTON VOIR PLUS
+// En fonction du mode actuel, on appelle l'API correspondante pour charger la page suivante de résultats
 loadMoreBtn.onclick = () => {
     currentPage++;
     const originalText = loadMoreBtn.textContent;
@@ -192,7 +217,7 @@ loadMoreBtn.onclick = () => {
     else if (currentMode === 'TOP_RATED') apiCall = () => fetchTopRatedMovies(currentPage);
     else if (currentMode === 'SEARCH') apiCall = () => searchMovies(currentQuery, currentPage);
     else if (currentMode === 'YEAR') apiCall = () => fetchMoviesByYear(+currentQuery, currentPage);
-
+// pour les favoris, on n'a pas de pagination, donc on ne fait rien
     if (apiCall) {
         apiCall().then(data => {
             renderGrid(data.results, getTitle(currentMode), true);
@@ -202,6 +227,8 @@ loadMoreBtn.onclick = () => {
 };
 
 // Thème & Init
+// On gère le thème clair/sombre avec un toggle et on stocke la préférence dans le localStorage
+//  pour la retrouver au prochain chargement de la page
 document.getElementById('theme-toggle')!.onclick = () => {
     document.body.classList.toggle('light-mode');
     localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
