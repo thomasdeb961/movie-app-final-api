@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 // importation et liaison des fichiers
 import { fetchPopularMovies, fetchTopRatedMovies, fetchMovieDetails, searchMovies, fetchMoviesByYear } from './services/api';
 import type { Movie } from './types/Movie';
@@ -14,8 +15,8 @@ const yearInput = document.getElementById('year-input') as HTMLInputElement;
 
 // Variables globales pour stocker l'état de l'application a partir du local 
 // et éviter les appels API redondants
-let favorites: Movie[] = JSON.parse(localStorage.getItem('myFavorites') || '[]');
-let compareList: Movie[] = [];
+const favorites: Movie[] = JSON.parse(localStorage.getItem('myFavorites') || '[]');
+const compareList: Movie[] = [];
 let currentMovies: Movie[] = [];
 let currentPage = 1;
 let currentMode: string = 'POPULAR'; // POPULAR, TOP_RATED, SEARCH, YEAR, FAVORITES
@@ -144,7 +145,7 @@ function toggleComp(m: Movie) {
 // une fct pour trier les films affichés en fonction du critère sélectionné (titre A-Z, Z-A, note)
 function handleSort() {
     const sort = sortSelect.value;
-    let sorted = [...currentMovies];
+    const sorted = [...currentMovies];
     if (sort === 'AZ') sorted.sort((a, b) => a.title.localeCompare(b.title));
     if (sort === 'ZA') sorted.sort((a, b) => b.title.localeCompare(a.title));
     if (sort === 'RATING') sorted.sort((a, b) => a.vote_average - b.vote_average);
